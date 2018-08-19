@@ -39,5 +39,6 @@ test_read_teams <- function(){
   })
 }
 
-
-test_read_teams()
+test_all <- function(){
+  test_read_teams()
+}
