@@ -45,10 +45,11 @@ library(readxl)
 # Code adapted from Jeromy Anglim, url:
 # "https://stackoverflow.com/questions/12945687/
 # read-all-worksheets-in-an-excel-workbook-into-an-r-list-with-data-frames"
-read_excel_allsheets <- function(filename, tibble = FALSE) {
+read_excel_allsheets <- function(filename, 
+                                 tibble = FALSE, colnames = FALSE) {
   sheets <- readxl::excel_sheets(filename)
   result <- lapply(sheets, function(X){
-    readxl::read_excel(filename, sheet = X)
+    readxl::read_excel(filename, sheet = X, col_names = colnames)
   })
   if(!tibble) result <- lapply(result, as.data.frame)
   names(result) <- sheets
@@ -80,8 +81,27 @@ read_teams_allsheets <- function(file, startRow, endRow,
   for(i in 1:length(teams)){
     tmp <- teams[[i]]
     tmp <- tmp[startRow:endRow, startCol:endCol]
-    names(tmp) <- teams[[i]][titleRow, startCol:endCol]
+    colnames(tmp) <- teams[[i]][titleRow, startCol:endCol]
     result[[i]] <- tmp
   }
   return(result)
+}
+
+# Function that manually coerces as much of the data as possible into 
+# a form better for ggplot use. This does not take input as for which 
+# data type each column should be, so it is a crude conversion. 
+# Converts to numeric if possible. Converts strings to factors. 
+# If can be neither numeric nor factor, will left left alone. 
+# Inputs:
+#   1) teams: a list of dataframes, each dataframe being a team at an event.
+# Outputs:
+#   1) teams: the same list of dataframes, but with data types coerced if 
+#     helpful. 
+manual_coerce <- function(teams){
+  for(i in 1:length(teams)){
+    for(j in 1:ncol(teams[[i]])){
+      
+    }
+  }
+  return(teams)
 }
