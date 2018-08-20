@@ -47,8 +47,41 @@ library(readxl)
 # read-all-worksheets-in-an-excel-workbook-into-an-r-list-with-data-frames"
 read_excel_allsheets <- function(filename, tibble = FALSE) {
   sheets <- readxl::excel_sheets(filename)
-  x <- lapply(sheets, function(X) readxl::read_excel(filename, sheet = X))
-  if(!tibble) x <- lapply(x, as.data.frame)
-  names(x) <- sheets
-  return(x)
+  result <- lapply(sheets, function(X){
+    readxl::read_excel(filename, sheet = X)
+  })
+  if(!tibble) result <- lapply(result, as.data.frame)
+  names(result) <- sheets
+  return(result)
+}
+
+# Reads a 1712-style .xlsm and isolates team data.
+# Team sheets much be sheets with numbers and only numbers as the title.
+# Any sheets that are not team data sheets must have at least one non-numeric
+# character in their title.
+# Inputs:
+#     1) file: the filename of the file we're reading.
+#     2) startRow: The first row of match data 1 = 1, 2 = 2, ...
+#     3) endRow: The row of the final match of data. 1 = 1, 2 = 2, ...
+#     4) startCol: The column of match #s. A = 1, B = 2, C = 3, ...
+#     5) endCol: The last variable to read in. A = 1, B = 2, C = 3, ...
+#     6) titleRow: The row containing the titles we want to use. 
+# Outputs:
+#     1) result: a list of dataframes, each for a single team.
+read_teams_allsheets <- function(file, startRow, endRow, 
+                                 startCol, endCol, titleRow){
+  # Extract teams from full file, ignoring any non-team data. 
+  # Defines non-team sheets as sheet for which the title, when coerced to 
+  # a numeric, will return NA. 
+  raw <- read_excel_allsheets(file)
+  teams <- raw[!is.na(as.numeric(names(raw)))]
+  result <- vector("list", length = 60)
+  names(result) <- names(teams)
+  for(i in 1:length(teams)){
+    tmp <- teams[[i]]
+    tmp <- tmp[startRow:endRow, startCol:endCol]
+    names(tmp) <- teams[[i]][titleRow, startCol:endCol]
+    result[[i]] <- tmp
+  }
+  return(result)
 }
