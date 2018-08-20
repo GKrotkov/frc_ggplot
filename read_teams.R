@@ -100,7 +100,14 @@ read_teams_allsheets <- function(file, startRow, endRow,
 manual_coerce <- function(teams){
   for(i in 1:length(teams)){
     for(j in 1:ncol(teams[[i]])){
-      
+      # If I can make it numeric, I do.
+      if(!anyNA(as.numeric(teams[[i]][, j]))){
+        teams[[i]][, j] <- as.numeric(teams[[i]][, j])
+      }
+      # If it can't be made numeric, make it a factor.
+      else{
+        teams[[i]][, j] <- factor(teams[[i]][, j])
+      }
     }
   }
   return(teams)
