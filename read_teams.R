@@ -112,3 +112,11 @@ manual_coerce <- function(teams){
   }
   return(teams)
 }
+
+# A simple wrapper function to make the interface for reading all teams
+# more direct. 
+read_team_sheets_coerced <- function(file, startRow, endRow, 
+                                     startCol, endCol, titleRow){
+  return(manual_coerce(read_teams_allsheets(file, startRow, endRow, 
+                                            startCol, endCol, titleRow)))
+}
