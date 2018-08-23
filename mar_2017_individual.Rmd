@@ -1,0 +1,51 @@
+---
+title: "mar_2017_individual"
+author: "Gabriel Krotkov"
+date: "August 22, 2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r, message = FALSE}
+source("read_teams.R")
+library(tidyverse)
+library(GGally)
+library(reshape2)
+```
+
+The following code can be modified to make this .rmd work on any sheet by simply modifying the filepath appropriately. 
+```{r, message = FALSE, warning = FALSE}
+path <- "data/2017_marcmp_full.xlsm"
+mar_teams <- read_team_sheets_coerced(path, 4, 15, 2, 24, 2)
+```
+
+```{r, warning = FALSE, message = FALSE}
+meltable_df <- function(teams, col){
+  data <- matrix(nrow = nrow(teams[[1]]), ncol = length(teams))
+  for(i in 1:length(teams)){
+    data[, i] <- teams[[i]][, col]
+  }
+  data <- data.frame(data)
+  colnames(data) <- names(teams)
+  return(data)
+}
+
+get_melted_indices <- function(melted, ids){
+  vec <- rep(FALSE, nrow(melted))
+  for(i in 1:length(ids)){
+    vec <- vec | melted$variable == ids[i]
+  }
+  return(vec)
+}
+
+melted <- melt(meltable_df(mar_teams, 14))
+
+idx <- get_melted_indices(melted, 
+                          c("11", "25", "56"))
+
+ggplot(melted[idx, ], aes(x = value)) + 
+  geom_histogram(aes(color = variable))
+```
