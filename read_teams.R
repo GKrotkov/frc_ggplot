@@ -120,13 +120,35 @@ manual_coerce <- function(teams){
   return(teams)
 }
 
+
+# Function that simply takes a numeric vector and converts all NA values
+# to 0. Does not allow conversion for factors. 
+na_to_zero <- function(column){
+  assert_that(is.numeric(column))
+  assert_that(!is.factor(column), 
+              msg = "Cannot convert NAs in factor columns to 0.")
+  return(ifelse(is.na(column), 0, column))
+}
+
+# Function that handles all NAs in a given list of teams. 
+clean_NAs <- function(teams){
+  for(i in 1:length(teams)){
+    for(j in 1:ncol(teams[[i]])){
+      if(is.numeric(teams[[i]][, j]) & !is.factor(teams[[i]][, j])){
+        teams[[i]][, j] <- na_to_zero(teams[[i]][, j])
+      }
+    }
+  }
+  return(teams)
+}
+
 # A simple wrapper function to make the interface for reading all teams
 # more direct. 
 read_team_sheets_coerced <- function(file, startRow, endRow, 
                                      startCol, endCol, titleRow){
-  return(manual_coerce(read_teams_allsheets(file, startRow, endRow, 
-                                            startCol, endCol, titleRow)))
+  prelim <- manual_coerce(read_teams_allsheets(file, startRow, endRow, 
+                                               startCol, endCol, titleRow))
+  return(clean_NAs(prelim))
 }
 
-# TODO: write a function that makes all NAs 0 in the team sheets. 
 # TODO: write a function that renames the columns for ease of use later.
