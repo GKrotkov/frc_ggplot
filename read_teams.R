@@ -151,4 +151,17 @@ read_team_sheets_coerced <- function(file, startRow, endRow,
   return(clean_NAs(prelim))
 }
 
-# TODO: write a function that renames the columns for ease of use later.
+# Renames the column names for each team in a list of teams
+# Inputs:
+#     1) teams: a list of team data frames
+#     2) var_names: a vector of length ncol(teams[[1]])
+# Outputs:
+#     1) teams: a list of team data frames with column names replaced
+rename_variables <- function(teams, var_names){
+  assert_that(length(var_names) == ncol(teams[[1]]), 
+              msg = "Length of supplied variable names is not the length of each team's data.")
+  for(i in 1:length(teams)){
+    colnames(mar_teams[[i]]) <- var_names
+  }
+  return(teams)
+}
