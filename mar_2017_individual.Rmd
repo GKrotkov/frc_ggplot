@@ -47,7 +47,7 @@ idx <- get_melted_indices(melted,
                           c("303", "834", "56", "1712", "11", "193", 
                             "365", "272", "2729"))
 
-ggplot(melted[idx, ], aes(x = value, y = variable)) + 
+ggplot(melted[idx, ], aes(x = value, y = factor(variable))) + 
   geom_jitter(aes(color = variable), width = 0, height = .2) + 
   coord_flip()
 ```
